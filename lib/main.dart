@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:mars_photos/ui/screens/home.dart';
+import 'package:mars_photos/utils/app_router.dart';
 import 'package:mars_photos/utils/color_schemes.g.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:mars_photos/utils/typography.dart';
+import 'package:sizer/sizer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,23 +26,27 @@ class MyApp extends StatelessWidget {
               Hive.box("settings").get("isDark", defaultValue: false);
           final String lang =
               Hive.box("settings").get("lang", defaultValue: "en");
-          return MaterialApp(
-            title: "app title",
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
-            supportedLocales: AppLocalizations.supportedLocales,
-            locale: Locale(lang),
-            theme: ThemeData(
-              colorScheme: lightColorScheme,
-              useMaterial3: true,
-              textTheme: textTheme,
-            ),
-            darkTheme: ThemeData(
-              colorScheme: darkColorScheme,
-              useMaterial3: true,
-              textTheme: textTheme,
-            ),
-            themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
-            home: const Home(),
+          return Sizer(
+            builder: (context, orientation, deviceType) {
+              return MaterialApp.router(
+                title: "app title",
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                locale: Locale(lang),
+                theme: ThemeData(
+                  colorScheme: lightColorScheme,
+                  useMaterial3: true,
+                  textTheme: textTheme,
+                ),
+                darkTheme: ThemeData(
+                  colorScheme: darkColorScheme,
+                  useMaterial3: true,
+                  textTheme: textTheme,
+                ),
+                themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+                routerConfig: router(),
+              );
+            }
           );
         });
   }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
+import '../../utils/router_constants.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
@@ -10,6 +13,12 @@ class Home extends StatelessWidget {
     final strings = AppLocalizations.of(context)!;
     final settingsBox = Hive.box("settings");
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          strings.appTitle,
+          style: Theme.of(context).textTheme.displayLarge,
+        ),
+      ),
       drawer: Drawer(
         child: ListView(
           shrinkWrap: true,
@@ -38,17 +47,10 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
-      appBar: AppBar(
-        title: Text(
-          strings.appTitle,
-          style: Theme.of(context).textTheme.displayLarge,
-        ),
-      ),
       body: Center(
-        child: Container(
-          padding: const EdgeInsets.all(15),
-          color: Theme.of(context).colorScheme.error,
-          child: const Text("Mars Photos"),
+        child: FilledButton(
+          onPressed: () => context.push(settingsPath),
+          child: Text("Settings"),
         ),
       ),
     );
