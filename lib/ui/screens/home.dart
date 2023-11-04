@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mars_photos/data/api/api.dart';
+import 'package:mars_photos/data/repo/repo.dart';
 
 import '../../utils/router_constants.dart';
 
@@ -52,6 +54,12 @@ class Home extends StatelessWidget {
           onPressed: () => context.push(settingsPath),
           child: Text("Settings"),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Repo().fetchLatestPhotos();
+        },
+        child: const Icon(Icons.webhook),
       ),
     );
   }
