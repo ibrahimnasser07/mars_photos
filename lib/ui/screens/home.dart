@@ -57,7 +57,7 @@ class Home extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Repo().fetchLatestPhotos();
+          Repo().fetchDatePhotos(DateTime(2022,10,10));
         },
         child: const Icon(Icons.webhook),
       ),
