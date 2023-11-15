@@ -1,7 +1,11 @@
+import 'package:flutter/cupertino.dart';
+import 'package:hive/hive.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:mars_photos/data/api/api.dart';
 import 'package:mars_photos/data/models/mars_photo.dart';
+import 'package:mars_photos/data/models/rover.dart';
+import 'package:mars_photos/utils/constants.dart';
 
 import '../db/db_functions.dart';
 
@@ -28,8 +32,18 @@ class Repo {
       savePhotosList(photos);
       return photos;
     } else {
-      return fetchDatePhotos(earthDate);
+      return fetchDatePhotosFromDB(earthDate);
     }
+  }
 
+  Future<bool> fetchCuriosityData() async {
+    try{
+      final data = await _api.fetchCuriosityData();
+      Rover rover = Rover.fromJson(data);
+      Hive.box<Rover>(roverDetailsKey).put(roverDetails, rover);
+      return true;
+    } catch(e){
+      return false;
+    }
   }
 }

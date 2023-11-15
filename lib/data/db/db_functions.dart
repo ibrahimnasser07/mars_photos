@@ -3,18 +3,19 @@ import 'package:mars_photos/utils/constants.dart';
 
 import '../models/mars_photo.dart';
 
+Box<MarsPhoto> marsPhotosBox = Hive.box<MarsPhoto>(marsPhotosKey);
+
 void savePhotosList(List<MarsPhoto> photos) {
   for (MarsPhoto photo in photos) {
-    final MarsPhoto localPhoto = Hive.box(marsPhotosKey).get(photo.id);
+    final MarsPhoto? localPhoto = marsPhotosBox.get(photo.id);
     if (localPhoto != photo) {
-      Hive.box(marsPhotosKey).put(photo.id, photo);
+      marsPhotosBox.put(photo.id, photo);
     }
   }
 }
 
-List<MarsPhoto> fetchDatePhotos(DateTime date) {
-  return Hive.box<MarsPhoto>(marsPhotosKey)
-      .values
+List<MarsPhoto> fetchDatePhotosFromDB(DateTime date) {
+  return marsPhotosBox.values
       .where((MarsPhoto photo) => photo.earthDate == date)
       .toList();
 }

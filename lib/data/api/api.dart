@@ -4,9 +4,9 @@ import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 
-class API {
-  late Dio _dio;
+late Dio _dio;
 
+class API {
   API() {
     _dio = Dio(
       BaseOptions(
@@ -66,4 +66,19 @@ class API {
       return [];
     }
   }
+
+  Future<Map<String,dynamic>> fetchCuriosityData() async {
+    try {
+      final Response response = await _dio.request("");
+      return response.data['rover'];
+    } catch (e) {
+      if (e is DioException) {
+        debugPrint(e.message);
+      } else {
+        debugPrint("Normal Error: $e");
+      }
+      return {};
+    }
+  }
+
 }

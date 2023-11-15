@@ -1,19 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:mars_photos/data/api/api.dart';
+import 'package:hive/hive.dart';
+import 'package:mars_photos/data/models/rover.dart';
 import 'package:mars_photos/data/repo/repo.dart';
+import 'package:mars_photos/ui/widgets/mars_photo_card.dart';
 
-import '../../utils/router_constants.dart';
+import '../../data/models/mars_photo.dart';
+import '../../utils/constants.dart';
+import '../widgets/home_drawer.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  bool dataReady = false;
+  List<MarsPhoto> marsPhotos = [];
+
+  @override
+  void initState() {
+    Repo().fetchCuriosityData().then((bool value) {
+      dataReady = value;
+      setState(() {});
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context)!;
-    final settingsBox = Hive.box("settings");
+    final Rover rover = Hive.box<Rover>(roverDetailsKey).get(roverDetails)!;
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -21,44 +40,37 @@ class Home extends StatelessWidget {
           style: Theme.of(context).textTheme.displayLarge,
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            ListTile(
-              title: Text(strings.theme),
-              trailing: Switch(
-                value: settingsBox.get("isDark", defaultValue: false),
-                onChanged: (v) => settingsBox.put("isDark", v),
-              ),
+      drawer: const HomeDrawer(),
+      body: !dataReady
+          ? const Text("Loading")
+          : Column(
+              children: [
+                ListTile(
+                  title: Text(strings.date),
+                  trailing: const Icon(Icons.calendar_month),
+                  onTap: () async {
+                    DateTime? date = await showDatePicker(
+                      context: context,
+                      initialDate: rover.maxDate,
+                      firstDate: rover.landingDate,
+                      lastDate: rover.maxDate,
+                    );
+                    marsPhotos =
+                        await Repo().fetchDatePhotos(date ?? rover.maxDate);
+                    setState(() {});
+                  },
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: marsPhotos.length,
+                    itemBuilder: (_, i) =>
+                        MarsPhotoCard(marsPhoto: marsPhotos[i]),
+                  ),
+                ),
+              ],
             ),
-            ListTile(
-              title: Text(strings.language),
-              trailing: DropdownButton(
-                items: <String>["en", "ar"]
-                    .map(
-                      (e) => DropdownMenuItem(
-                        value: e,
-                        child: Text(e == "ar" ? "Arabic" : "English"),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (v) => settingsBox.put("lang", v!),
-              ),
-            ),
-          ],
-        ),
-      ),
-      body: Center(
-        child: FilledButton(
-          onPressed: () => context.push(settingsPath),
-          child: Text("Settings"),
-        ),
-      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Repo().fetchDatePhotos(DateTime(2022,10,10));
-        },
+        onPressed: () => Repo().fetchCuriosityData(),
         child: const Icon(Icons.webhook),
       ),
     );
