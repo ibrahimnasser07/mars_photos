@@ -50,11 +50,14 @@ class API {
     }
   }
 
-  Future<List<dynamic>> fetchDatePhotos(String earthDate) async {
+  Future<List<dynamic>> fetchDatePhotos(String earthDate, {int? page}) async {
     try {
       final Response response = await _dio.request(
         "/photos",
-        queryParameters: {"earth_date": earthDate},
+        queryParameters: {
+          "earth_date": earthDate,
+          "page":page,
+        },
       );
       return response.data['photos'];
     } catch (e) {
@@ -67,7 +70,7 @@ class API {
     }
   }
 
-  Future<Map<String,dynamic>> fetchCuriosityData() async {
+  Future<Map<String, dynamic>> fetchCuriosityData() async {
     try {
       final Response response = await _dio.request("");
       return response.data['rover'];
@@ -80,5 +83,4 @@ class API {
       return {};
     }
   }
-
 }
